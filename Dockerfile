@@ -1,8 +1,11 @@
-FROM library/node:slim
+FROM node:latest
 
-COPY . /app
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+COPY package.json /usr/src/app/
 
-RUN cd /app \
-  && npm install --production
+RUN npm set progress=false
+RUN npm install
+RUN npm install -g reggie
 
-WORKDIR /app
+COPY . /usr/src/app
