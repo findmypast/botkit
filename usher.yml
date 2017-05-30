@@ -43,7 +43,7 @@ tasks:
         options:
           register: token
       - do: shell
-        command: docker run --name <%=service_image_name%>-test-runner --rm <%=registry%>/findmypast/<%=service_image_name%>:<%=version%> npm run test
+        command: TOKEN=<%=token%> docker run --name <%=service_image_name%>-test-runner --rm <%=registry%>/findmypast/<%=service_image_name%>:<%=version%> npm run test
 
   publish:
     description: Publish Botkit to internal NPM
