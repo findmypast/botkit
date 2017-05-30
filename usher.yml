@@ -20,25 +20,19 @@ include:
 
 tasks:
   build:
-    do: sequence
-    actions:
-      - description: Build Botkit stress test image for the repository
-        do: global.docker.create_image
-        service_name: <%=service_image_name%>
+    description: Build Botkit stress test image for the repository
+    do: global.docker.create_image
+    service_name: <%=service_image_name%>
 
   push:
-    do: sequence
-    actions:
-      - description: Push Botkit stress tests image to the repository
-        do: global.docker.push_image
-        service_name: <%=service_image_name%>
+    description: Push Botkit stress tests image to the repository
+    do: global.docker.push_image
+    service_name: <%=service_image_name%>
 
   pull:
-    do: sequence
-    actions:
-      - description: Pull Botkit stress tests image from the repository
-        do: global.docker.pull_image
-        service_name: <%=service_image_name%>
+    description: Pull Botkit stress tests image from the repository
+    do: global.docker.pull_image
+    service_name: <%=service_image_name%>
 
   test:
     description: Run Botkit unit tests
@@ -48,10 +42,8 @@ tasks:
         path: test/token
         options:
           register: token
-      - do: global.docker.compose_run
-        service_folder: .
-        compose_filename: docker-compose-test.yml
-        service_name: test
+      - do: shell
+        command: docker run --name <%=service_image_name%>-test-runner --rm <%=registry%>/findmypast/<%=service_image_name%>:<%=version%> npm run test
 
   publish:
     description: Publish Botkit to internal NPM
