@@ -65,6 +65,6 @@ tasks:
   read_key_auth:
     do: global.domesday.read_key_value_auth
     description: Read Raiser secrets from the vault
-    key: secret/<%=base_service_name%>/<%=path%>
+    key: secret/<%=service_image_name%>/<%=path%>
     vault_username: <%=tc_username%>
     vault_password: <%=tc_password%>
