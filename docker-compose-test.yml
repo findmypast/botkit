@@ -1,10 +1,8 @@
 version: '2'
 services:
   test:
-    build:
-      context: .
-      dockerfile: Dockerfile-unit-tests
+    image: $IMAGE
     environment:
       - NODE_ENV=test
       - TOKEN=$TOKEN
-    command: npm test
+    command: npm run test

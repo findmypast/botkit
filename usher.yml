@@ -1,38 +1,27 @@
 version: '2'
+
 vars:
   registry: docker-registry.dun.fh
-  service_image_name: botkit
+  base_service_name: botkit
   token:
-  service_folder: .
-
-  docker_environment: &DOCKER_ENV
-    - DOCKER_TLS_VERIFY=1
-    - DOCKER_HOST=tcp://<%=service_node%>.dun.fh:2376
-    - &IMAGE IMAGE=<%=registry%>/findmypast/<%=service_image_name%>:<%=version%>
-    - TOKEN=<%=token%>
 
 include:
   - from: git+ssh://git@github.com:findmypast/usher_shared_tasks.git
     name: shared_tasks as global
     import:
-      - domesday
       - docker
 
 tasks:
   build:
-    description: Build Botkit stress test image for the repository
+    description: Build Botkit
     do: global.docker.create_image
-    service_name: <%=service_image_name%>
+    service_folder: .
+    service_name: <%=base_service_name%>
 
   push:
-    description: Push Botkit stress tests image to the repository
+    description: Push the Botkit image to the Docker registry
     do: global.docker.push_image
-    service_name: <%=service_image_name%>
-
-  pull:
-    description: Pull Botkit stress tests image from the repository
-    do: global.docker.pull_image
-    service_name: <%=service_image_name%>
+    service_name: <%=base_service_name%>
 
   test:
     description: Run Botkit unit tests
@@ -42,8 +31,13 @@ tasks:
         path: test/token
         options:
           register: token
-      - do: shell
-        command: TOKEN=<%=token%> docker run --name <%=service_image_name%>-test-runner --rm <%=registry%>/findmypast/<%=service_image_name%>:<%=version%> npm run test
+      - do: global.docker.compose_run
+        service_folder: .
+        compose_filename: docker-compose-test.yml
+        service_name: test
+        env:
+          - IMAGE=<%=registry%>/findmypast/<%=base_service_name%>:<%=version%>
+          - TOKEN=<%=token%>
 
   publish:
     description: Publish Botkit to internal NPM
@@ -52,11 +46,11 @@ tasks:
     compose_filename: docker-compose-publish.yml
     service_name: publish
     env:
-      - IMAGE=<%=registry%>/findmypast/<%=service_image_name%>:<%=version%>
+      - IMAGE=<%=registry%>/findmypast/<%=base_service_name%>:<%=version%>
 
   read_key_auth:
     do: global.domesday.read_key_value_auth
     description: Read Raiser secrets from the vault
-    key: secret/<%=service_image_name%>/<%=path%>
+    key: secret/<%=base_service_name%>/<%=path%>
     vault_username: <%=tc_username%>
     vault_password: <%=tc_password%>
