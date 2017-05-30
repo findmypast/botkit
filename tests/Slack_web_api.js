@@ -29,32 +29,32 @@ describe('Botkit', function() {
         done();
     });
 
-    it('should start and then stop', function(done) {
-        var controller = Botkit.slackbot({debug: false});
-        var openIsCalled = false;
-
-        controller.on('rtm_open', function(bot) {
-            should.exist(bot);
-            openIsCalled = true;
-        });
-
-        controller.on('rtm_close', function(bot) {
-            should.exist(bot);
-            openIsCalled.should.be.true;
-            controller.shutdown();
-            done();
-        });
-
-        controller
-            .spawn({
-                token: token
-            })
-            .startRTM(function(err, bot, payload) {
-                (err === null).should.be.true;
-                should.exist(bot);
-                bot.closeRTM();
-            });
-    });
+    // it('should start and then stop', function(done) {
+    //     var controller = Botkit.slackbot({debug: false});
+    //     var openIsCalled = false;
+    //
+    //     controller.on('rtm_open', function(bot) {
+    //         should.exist(bot);
+    //         openIsCalled = true;
+    //     });
+    //
+    //     controller.on('rtm_close', function(bot) {
+    //         should.exist(bot);
+    //         openIsCalled.should.be.true;
+    //         controller.shutdown();
+    //         done();
+    //     });
+    //
+    //     controller
+    //         .spawn({
+    //             token: token
+    //         })
+    //         .startRTM(function(err, bot, payload) {
+    //             (err === null).should.be.true;
+    //             should.exist(bot);
+    //             bot.closeRTM();
+    //         });
+    // });
 
     it('should have fail with false token', function(done) {
         this.timeout(5000);
