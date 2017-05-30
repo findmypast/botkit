@@ -1,0 +1,54 @@
+version: '2'
+vars:
+  registry: docker-registry.dun.fh
+  service_image_name: botkit
+  service_folder: .
+
+  docker_environment: &DOCKER_ENV
+    - DOCKER_TLS_VERIFY=1
+    - DOCKER_HOST=tcp://<%=service_node%>.dun.fh:2376
+    - &IMAGE IMAGE=<%=registry%>/findmypast/<%=service_image_name%>:<%=version%>
+
+include:
+  - from: git+ssh://git@github.com:findmypast/usher_shared_tasks.git
+    name: shared_tasks as global
+    import:
+      - docker
+
+tasks:
+  build:
+    do: sequence
+    actions:
+      - description: Build Botkit stress test image for the repository
+        do: global.docker.create_image
+        service_name: <%=service_image_name%>
+
+  push:
+    do: sequence
+    actions:
+      - description: Push Botkit stress tests image to the repository
+        do: global.docker.push_image
+        service_name: <%=service_image_name%>
+
+  pull:
+    do: sequence
+    actions:
+      - description: Pull Botkit stress tests image from the repository
+        do: global.docker.pull_image
+        service_name: <%=service_image_name%>
+
+  test:
+    description: Run Botkit unit tests
+    do: global.docker.compose_run
+    service_folder: .
+    compose_filename: docker-compose-test.yml
+    service_name: test
+
+  publish:
+    description: Publish Botkit to internal NPM
+    do: global.docker.compose_run
+    service_folder: .
+    compose_filename: docker-compose-publish.yml
+    service_name: publish
+    env:
+      - IMAGE=<%=registry%>/findmypast/<%=service_image_name%>:<%=version%>
