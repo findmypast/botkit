@@ -6,4 +6,5 @@ services:
       dockerfile: Dockerfile-unit-tests
     environment:
       - NODE_ENV=test
+      - TOKEN=$TOKEN
     command: npm test
