@@ -34,6 +34,7 @@
     "winston": "^2.3.1"
   },
   "scripts": {
+    "publish": "reggie --url http://npm.findmypast.dun.fh:5001/ publish",
     "pretest": "jscs ./lib/",
     "test": "mocha tests/*.js"
   },
